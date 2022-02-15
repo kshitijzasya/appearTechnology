@@ -32,12 +32,12 @@
           <div class="input_bg">
             <div class="total_amount">
               <label>{{ repaymentTerms.find(i => i.id == selectedRepaymentTerm).text}} Repayment</label>
-              <h4>${{ monthlyRepayment }}</h4>
+              <h4>${{ frequencyRepaymentChange }}</h4>
             </div>
 
             <div class="total_amount">
               <label>Total Repayment</label>
-              <h4>${{ totalReplayment }}</h4>
+              <h4>${{ totalRepaymentChange }}</h4>
             </div>
           </div>
           <div class="input_bg">
@@ -60,35 +60,44 @@ export default {
                 {
                     id: 1,
                     name: '1 Years',
+                    rate: 2.9
                 },
                 {
                     id: 2,
                     name: '2 Years',
+                    rate: 3.1
                 },
                 {
                     id: 3,
                     name: '3 Years',
+                    rate: 3.3
                 },
                 {
                     id: 4,
                     name: '4 Years',
+                    rate: 3.6
                 }
             ],
             repaymentTerms: [
-                { id: 1, text: 'Weekly' },
-                { id: 2, text: 'Fortnightly' },
-                { id: 3, text: 'Monthly' },
-                { id: 4, text: 'Yearly' }
+                { id: 1, text: 'Weekly', value: 52 },
+                { id: 2, text: 'Fortnightly', value: 26 },
+                { id: 3, text: 'Monthly', value: 12 }
             ],
             selectedLoanTerm: 1,
             selectedRepaymentTerm: 1,
-            monthlyRepayment: 99.62,
-            totalReplayment: 99.63
+            frequencyRepayment: 0.0,
+            totalRepayment: 0.0
         }
     },
     computed: {
         rangeChange: function() {
             return this.rangeValue;
+        },
+        frequencyRepaymentChange: function() {
+          return this.frequencyRepayment
+        },
+        totalRepaymentChange: function() {
+          return this.totalRepayment
         }
     },
     methods: {
@@ -97,12 +106,23 @@ export default {
         var value = ((_this.value - _this.min) / (_this.max - _this.min)) * 100; 
         _this.style.background = 'linear-gradient(to right, #4339cd 0%, #4339cd ' + value + '%, #e9e9e9 ' + value + '%)'; 
         this.rangeValue = _this.value;
+        this.calculateRepayments()
         },
         loanYearChange: function(e) {
-            this.selectedLoanTerm = e.target.value
+            this.selectedLoanTerm = e.target.value;
+            this.calculateRepayments();
         },
         repaymentTermsChange: function(e) {
             this.selectedRepaymentTerm = e.target.value;
+            this.calculateRepayments()
+        },
+        calculateRepayments: function() {
+          let interest = this.loanTerms.find(i => i.id == this.selectedLoanTerm).rate;
+          let interval = this.loanTerms.find(i => i.id == this.selectedLoanTerm).id;
+          let freq = this.repaymentTerms.find(i => i.id == this.selectedRepaymentTerm).value;
+          let rangeValue = parseInt(this.rangeValue);
+          this.totalRepayment = ((rangeValue * interest) / 100) + rangeValue;
+          this.frequencyRepayment = parseFloat(this.totalRepayment / (freq * interval)).toFixed(2);
         }
     }
 }
@@ -128,7 +148,7 @@ export default {
 
 .form_bg
 {
-    position: fixed;
+    position: absolute;
     padding: 20px;
     border-radius: 5px;
     background: white;
@@ -207,5 +227,39 @@ export default {
     border-radius: 50%;
     -webkit-appearance: none;
   }
+
+@media screen and (max-height: 700px) {
+  .form_bg {
+    margin: 10px;
+  }
+}
+
+/************************************************************************************
+smaller than 768
+*************************************************************************************/
+@media only screen and (max-width: 768px) {
+  .form_bg {
+    width: 95% !important;
+    margin: 10px;
+    top: 30%;
+  }
+
+  .bg_left {
+    background: #2e2fd5;
+    display: none;
+  }
+
+  .bg_right img {
+    width: 100%;
+    height: auto !important;
+  }
+  .input_bg {
+    margin-bottom:10px;
+  }
+
+  .input_bg button {
+    margin-top: 10px
+  }
+}
 
 </style>
