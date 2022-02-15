@@ -142,8 +142,7 @@ export default {
 .bg_right img
 {
 	width:100%;
-	height:100%;
-	
+	object-fit: cover;
 }
 
 .form_bg
